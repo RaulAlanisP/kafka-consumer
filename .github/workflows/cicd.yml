@@ -4,8 +4,8 @@ on:
     branches:
       - main
 jobs:
-  build-deploy:
-    name: Build and deploy kafka-consumer
+  project-build:
+    name: Build kafka-consumer
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,7 +25,7 @@ jobs:
       - name: Unit tests
         run: mvn test
 
-      - name: Build the api
+      - name: Build the spring project
         run: mvn clean package
 
       - name: Login to DockerHub
@@ -34,9 +34,16 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push the docker image to docker hub
         uses: docker/build-push-action@v6
         with:
-          context: kafka-consumer
+          context: .
+          file: Dockerfile
           push: true
           tags: raulalanis/kafka-consumer:${{ github.sha }}
