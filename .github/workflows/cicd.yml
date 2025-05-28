@@ -4,8 +4,8 @@ on:
     branches:
       - main
 jobs:
-  build-deploy:
-    name: Build and deploy kafka-consumer
+  project-build:
+    name: Build kafka-consumer
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,7 +25,7 @@ jobs:
       - name: Unit tests
         run: mvn test
 
-      - name: Build the api
+      - name: Build the spring project
         run: mvn clean package
 
       - name: Login to DockerHub
