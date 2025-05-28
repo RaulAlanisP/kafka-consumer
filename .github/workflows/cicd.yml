@@ -6,7 +6,7 @@ on:
 jobs:
   build-deploy:
     name: Build and deploy kafka-consumer
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,11 +29,10 @@ jobs:
         run: mvn clean package
 
       - name: Build and push the docker image to docker hub
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-          context: .
-          dockerfile: Dockerfile
+          repository: ${{ github.repository }}
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.repository }}:${{ github.sha }}
+          tags: raulalanis/kafka-consumer:${{ github.sha }}
