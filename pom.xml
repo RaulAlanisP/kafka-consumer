@@ -83,6 +83,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>kafka-consumer</finalName>
 	</build>
 
 </project>
