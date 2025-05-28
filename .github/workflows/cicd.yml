@@ -1,0 +1,39 @@
+name: build and deploy kafka-consumer
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-deploy:
+    name: Build and deploy kafka-consumer
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup jdk 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 17
+
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v4.4
+        with:
+          maven-version: 3.8.2
+
+      - name: Unit tests
+        run: mvn test
+
+      - name: Build the api
+        run: mvn clean package
+
+      - name: Build and push the docker image to docker hub
+        uses: docker/build-push-action@v4
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          context: .
+          dockerfile: Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.repository }}:${{ github.sha }}
