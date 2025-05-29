@@ -1,14 +1,12 @@
 name: build and deploy kafka-consumer
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 jobs:
   project-build:
     name: Build kafka-consumer
     runs-on: ubuntu-latest
-
 
     services:
       zookeeper:
@@ -48,41 +46,39 @@ jobs:
           CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
           CONFLUENT_METRICS_ENABLE: "true"
           CONFLUENT_SUPPORT_CUSTOMER_ID: "anonymous"
-        depends_on:
-          zookeeper:
-            condition: service_healthy
 
-      schema-registry:
-        image: confluentinc/cp-schema-registry:5.4.0
-        ports:
-          - 8081:8081
-        options: >-
-          --health-cmd "nc -z localhost:8081"
-          --health-interval 20s
-          --health-timeout 10s
-          --health-retries 5
-        env:
-          SCHEMA_REGISTRY_HOST_NAME: schema-registry
-          SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
 
-      control-center:
-        image: confluentinc/cp-enterprise-control-center:5.4.0
-        ports:
-          - 9021:9021
-        options: >-
-          --health-cmd "nc -z localhost:9021"
-          --health-interval 20s
-          --health-timeout 10s
-          --health-retries 5
-        env:
-          CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
-          CONTROL_CENTER_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-          CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
-          CONTROL_CENTER_REPLICATION_FACTOR: 1
-          CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
-          CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
-          CONFLUENT_METRICS_TOPIC_REPLICATION: 1
-          PORT: 9021
+#      schema-registry:
+#        image: confluentinc/cp-schema-registry:5.4.0
+#        ports:
+#          - 8081:8081
+#        options: >-
+#          --health-cmd "nc -z localhost:8081"
+#          --health-interval 20s
+#          --health-timeout 10s
+#          --health-retries 5
+#        env:
+#          SCHEMA_REGISTRY_HOST_NAME: schema-registry
+#          SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
+#
+#      control-center:
+#        image: confluentinc/cp-enterprise-control-center:5.4.0
+#        ports:
+#          - 9021:9021
+#        options: >-
+#          --health-cmd "nc -z localhost:9021"
+#          --health-interval 20s
+#          --health-timeout 10s
+#          --health-retries 5
+#        env:
+#          CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
+#          CONTROL_CENTER_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+#          CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+#          CONTROL_CENTER_REPLICATION_FACTOR: 1
+#          CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+#          CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+#          CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+#          PORT: 9021
 
     env:
       SPRING_PROFILES_ACTIVE: default
